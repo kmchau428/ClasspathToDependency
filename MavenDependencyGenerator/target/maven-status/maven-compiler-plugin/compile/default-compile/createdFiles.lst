@@ -1,0 +1,5 @@
+EclipseClasspathFileReader.class
+Main.class
+DependencyXmlGenerator.class
+IClasspathFileReader.class
+DependencyGroupSearcher.class
