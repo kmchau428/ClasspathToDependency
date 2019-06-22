@@ -1,17 +1,22 @@
+import reader.IClasspathFileReader;
+import reader.IntelliJClasspathFileReader;
+
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            IClasspathFileReader classpathFileReader = new EclipseClasspathFileReader();
-            List<String> dependencyList = classpathFileReader.read("C:/projects/Test");
+//            reader.IClasspathFileReader classpathFileReader = new reader.EclipseClasspathFileReader();
+//            List<String> dependencyList = classpathFileReader.read("C:/projects/Test");
+
+            IClasspathFileReader classpathFileReader = new IntelliJClasspathFileReader();
+            List<String> dependencyList = classpathFileReader.read("C:/projects/TestProjIntelliJ");
 
             System.out.println(dependencyList);
 
             DependencyXmlGenerator.generatePomFile("C:\\projects\\lib_cmp", dependencyList);
 
-            DependencyGroupSearcher.findGroup("", "");
             System.out.println("COMPLETED");
 
         }

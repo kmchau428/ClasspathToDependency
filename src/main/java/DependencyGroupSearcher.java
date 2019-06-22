@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 public class DependencyGroupSearcher {
 
-    public static void findGroup(String artificatId, String version) {
+    public static void findGroup(String artifactId, String version) {
         Client client = Client.create();
 
 //        WebResource webResource = client

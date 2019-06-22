@@ -1,3 +1,5 @@
+package reader;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,11 +17,11 @@ import java.util.List;
 public class EclipseClasspathFileReader implements IClasspathFileReader {
     @Override
     public List<String> read(String filePath) throws ParserConfigurationException, IOException, SAXException {
-        File fXmlFile = new File(filePath + File.separator + ".classpath");
+        File libXmlFile = new File(filePath + File.separator + ".classpath");
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(fXmlFile);
+        Document doc = docBuilder.parse(libXmlFile);
 
         doc.getDocumentElement().normalize();
 

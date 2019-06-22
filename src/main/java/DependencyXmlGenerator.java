@@ -41,6 +41,7 @@ public class DependencyXmlGenerator {
                 Element dependencyElement = doc.createElement("dependency");
                 rootElement.appendChild(dependencyElement);
 
+                //DependencyGroupSearcher.findGroup("", "");
                 Element groupIdElement = doc.createElement("groupId");
                 groupIdElement.appendChild(doc.createTextNode("myGroup"));
                 dependencyElement.appendChild(groupIdElement);
@@ -54,8 +55,6 @@ public class DependencyXmlGenerator {
                 dependencyElement.appendChild(versionElement);
 
             }
-
-
         }
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
