@@ -18,6 +18,7 @@ public class EclipseClasspathFileReader implements IClasspathFileReader {
     @Override
     public List<String> read(String filePath) throws ParserConfigurationException, IOException, SAXException {
         File libXmlFile = new File(filePath + File.separator + ".classpath");
+        System.out.println("Processing file: " +libXmlFile.getName());
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -25,7 +26,7 @@ public class EclipseClasspathFileReader implements IClasspathFileReader {
 
         doc.getDocumentElement().normalize();
 
-        System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+        //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 
         NodeList nodeList = doc.getElementsByTagName("classpathentry");
 

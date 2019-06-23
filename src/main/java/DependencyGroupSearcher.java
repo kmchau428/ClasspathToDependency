@@ -9,24 +9,29 @@ import javax.ws.rs.core.MediaType;
 
 public class DependencyGroupSearcher {
 
-    public static void findGroup(String artifactId, String version) {
+    public static String findGroupId(String artifactId, String version) {
         Client client = Client.create();
 
-//        WebResource webResource = client
-//                .resource("https://search.maven.org/solrsearch/select?q=a:\"jersey-client\" AND v:\"1.19.4\" AND p:\"jar\"&rows=20&wt=json");
+        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22%20&rows=1&wt=json";
+        System.out.println("resolving the groupId: " + endpoint);
+        WebResource webResource = client.resource(endpoint);
 
-
-        ClientConfig cfg = new DefaultClientConfig(GensonJsonConverter.class);
-        //Client client = Client.create(cfg);
-        WebResource webResource = client.resource("https://search.maven.org/solrsearch/select?q=a:%22jersey-client%22%20AND%20v:%221.19.4%22%20AND%20p:%22jar%22&rows=20&wt=json");
-
-        Object pojo = webResource
+        String resp = webResource
                 .accept(MediaType.APPLICATION_JSON)
-                .get(Object.class);
+                .get(Object.class)
+                .toString();
 
-        System.out.println(pojo);
+        int groupIdIdx = resp.indexOf("g=");
+        String groupId = "unclassified";
+
+        if (groupIdIdx < 0) { //not found
+            System.out.println("The groupId of the jar " + artifactId + "-" + version + " cannot be found");
+        }
+        else {
+            groupId = resp.substring(groupIdIdx+2, resp.indexOf(",",groupIdIdx));
+        }
+
+        return groupId;
     }
-
-
 
 }

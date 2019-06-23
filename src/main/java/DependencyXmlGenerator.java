@@ -30,20 +30,24 @@ public class DependencyXmlGenerator {
             if (matcher.find())
             {
                 String jar = matcher.group(0);
-                System.out.println(jar);
+                System.out.println("Resolving jar: " + jar);
 
                 String artifactId = jar.split("-\\d[.]")[0];
-                System.out.println(artifactId);
+//                System.out.println(artifactId);
 
                 String version = jar.substring(jar.lastIndexOf("-")+1, jar.lastIndexOf(".jar"));
-                System.out.println(version);
+//                System.out.println(version);
+
+                String groupId = DependencyGroupSearcher.findGroupId(artifactId, version);
+//                System.out.println(groupId);
+
+                System.out.println();
 
                 Element dependencyElement = doc.createElement("dependency");
                 rootElement.appendChild(dependencyElement);
 
-                //DependencyGroupSearcher.findGroup("", "");
                 Element groupIdElement = doc.createElement("groupId");
-                groupIdElement.appendChild(doc.createTextNode("myGroup"));
+                groupIdElement.appendChild(doc.createTextNode(groupId));
                 dependencyElement.appendChild(groupIdElement);
 
                 Element artifactIdElement = doc.createElement("artifactId");
@@ -62,7 +66,7 @@ public class DependencyXmlGenerator {
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "5");
         DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File(fileDest + File.separator + "pom_test.xml"));
+        StreamResult result = new StreamResult(new File(fileDest + File.separator + "pom_dependency.xml"));
 
         transformer.transform(source, result);
 

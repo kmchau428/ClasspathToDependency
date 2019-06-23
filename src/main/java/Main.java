@@ -1,5 +1,4 @@
-import reader.IClasspathFileReader;
-import reader.IntelliJClasspathFileReader;
+import reader.*;
 
 import java.util.List;
 
@@ -7,15 +6,36 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-//            reader.IClasspathFileReader classpathFileReader = new reader.EclipseClasspathFileReader();
-//            List<String> dependencyList = classpathFileReader.read("C:/projects/Test");
 
-            IClasspathFileReader classpathFileReader = new IntelliJClasspathFileReader();
-            List<String> dependencyList = classpathFileReader.read("C:/projects/TestProjIntelliJ");
+            String ide = "", inputPath = "", outputPath = "";
+            for (String arg : args) {
+                if (arg.startsWith("-i")) {
+                    ide = arg.substring(2);
+                }
+                else if (arg.startsWith("-s")) {
+                    inputPath = arg.substring(2);
+                }
+                else if (arg.startsWith("-o")) {
+                    outputPath = arg.substring(2);
+                }
+            }
 
-            System.out.println(dependencyList);
+            IClasspathFileReader classpathFileReader = null;
+            switch (ide) {
+                case "IntelliJ":
+                    classpathFileReader = new IntelliJClasspathFileReader();
+                    break;
+                case "Eclipse":
+                    classpathFileReader = new EclipseClasspathFileReader();
+                    break;
+                default:
+                    break;
+            }
+            List<String> dependencyList = classpathFileReader.read(inputPath);
 
-            DependencyXmlGenerator.generatePomFile("C:\\projects\\lib_cmp", dependencyList);
+            //System.out.println(dependencyList);
+
+            DependencyXmlGenerator.generatePomFile(outputPath, dependencyList);
 
             System.out.println("COMPLETED");
 
