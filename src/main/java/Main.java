@@ -33,7 +33,8 @@ public class Main {
             }
             List<String> dependencyList = classpathFileReader.read(inputPath);
 
-            //System.out.println(dependencyList);
+            System.out.println("Dependency List:");
+            System.out.println(dependencyList);
 
             DependencyXmlGenerator.generatePomFile(outputPath, dependencyList);
 
