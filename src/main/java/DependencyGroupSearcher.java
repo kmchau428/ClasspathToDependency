@@ -13,8 +13,8 @@ public class DependencyGroupSearcher {
     public static String findGroupId(String artifactId, String version) {
         Client client = Client.create();
 
-//        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22&wt=json";
-        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + "maven-ear-plugin" + "%22&wt=json";
+        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22&wt=json";
+//        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + "maven-ear-plugin" + "%22&wt=json";
         System.out.println("resolving the groupId: " + endpoint);
         WebResource webResource = client.resource(endpoint);
 
