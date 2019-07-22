@@ -24,11 +24,14 @@ public class DependencyXmlGenerator {
         Element rootElement = doc.createElement("dependencies");
         doc.appendChild(rootElement);
 
+        int successCount = 0;
         for (String dependencyItem : dependencyList) {
             Pattern pattern = Pattern.compile("([^\\/]+\\.jar)$");
             Matcher matcher = pattern.matcher(dependencyItem);
             if (matcher.find())
             {
+                successCount++;
+
                 String jar = matcher.group(0);
                 System.out.println("Resolving jar: " + jar);
 
@@ -69,6 +72,8 @@ public class DependencyXmlGenerator {
         StreamResult result = new StreamResult(new File(fileDest + File.separator + "pom_dependency.xml"));
 
         transformer.transform(source, result);
+
+        System.out.println("Conversation rate: " + successCount / dependencyList.size() * 100 + "%");
 
     }
 }
