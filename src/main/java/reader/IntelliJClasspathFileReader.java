@@ -69,7 +69,7 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
 
     private List<String> resolveFiles(String url, String filePath, List<String> jarClasspaths) {
         if (url.contains("$PROJECT_DIR$")) {
-            url = url.replaceAll("\\$PROJECT_DIR\\$", filePath);
+            parentDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
         }
         else if (url.contains("$USER_HOME$")) {
             url = url.replaceAll("\\$USER_HOME\\$",
