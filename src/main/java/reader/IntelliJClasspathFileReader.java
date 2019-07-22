@@ -61,26 +61,29 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
     }
 
     private List<String> resolveJars(String url, List<String> jarClasspaths) {
-        jarClasspaths.add(url.substring(url.lastIndexOf("/", url.lastIndexOf("!/"))+1, url.lastIndexOf("!/"))); //the entry ends with !/
+        jarClasspaths.add(url.substring(0, url.lastIndexOf("!/"))); //the entry ends with !/
 
 
         return jarClasspaths;
     }
 
     private List<String> resolveFiles(String url, String filePath, List<String> jarClasspaths) {
+        //NodeList nodeList = doc.getElementsByTagName("jarDirectory");
+        String parentDir = "";
         if (url.contains("$PROJECT_DIR$")) {
             parentDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
         }
-        else if (url.contains("$USER_HOME$")) {
-            url = url.replaceAll("\\$USER_HOME\\$",
-                System.getProperty("user.home").replaceAll("\\\\", "/"));
+        else if (url.contains("USER_HOME")) {
+            parentDir = System.getProperty("user.home");
         }
 
-        String jarDirPath = url.substring(url.indexOf("//") + 2);
+        String jarDirPath = url.substring(url.lastIndexOf("$") + "$".length() + 1);
+//        System.out.println("jarDirPath**" + jarDirPath);
         Path p1 = Paths.get(jarDirPath);
-        String normalizedJarDirPath = p1.normalize().toString();
+        String normalizedJarDirPath = p1.normalize().toString().replace(".." + File.separator,"");
+//        System.out.println("normalizedJarDirPath**" + normalizedJarDirPath);
 
-        File jarDir = new File(normalizedJarDirPath);
+        File jarDir = new File(parentDir + File.separator + normalizedJarDirPath);
         for (File jar : jarDir.listFiles()) {
             jarClasspaths.add(jar.getName());
         }
