@@ -71,7 +71,7 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
         //NodeList nodeList = doc.getElementsByTagName("jarDirectory");
         String parentDir = "";
         if (url.contains("$PROJECT_DIR$")) {
-            parentDir = filePath.substring(0, filePath.lastIndexOf("/"));
+            parentDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
         }
         else if (url.contains("USER_HOME")) {
             parentDir = System.getProperty("user.home");
