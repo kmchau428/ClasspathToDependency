@@ -1,5 +1,7 @@
+import searcher.PublicDependencyGroupSearcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import searcher.IDependencyGroupSearcher;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,12 +13,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DependencyXmlGenerator {
-    public static void generatePomFile(String fileDest, List<String> dependencyList) throws TransformerException, ParserConfigurationException {
+    public static void generatePomFile(String fileDest, List<String> dependencyList, List<IDependencyGroupSearcher> searchers) throws TransformerException, ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -25,13 +29,12 @@ public class DependencyXmlGenerator {
         doc.appendChild(rootElement);
 
         int successCount = 0;
+        Set<String> dependencySet = new HashSet<>();
         for (String dependencyItem : dependencyList) {
             Pattern pattern = Pattern.compile("([^\\/]+\\.jar)$");
             Matcher matcher = pattern.matcher(dependencyItem);
             if (matcher.find())
             {
-                successCount++;
-
                 String jar = matcher.group(0);
                 System.out.println("Resolving jar: " + jar);
 
@@ -41,8 +44,22 @@ public class DependencyXmlGenerator {
                 String version = jar.substring(jar.lastIndexOf("-")+1, jar.lastIndexOf(".jar"));
 //                System.out.println(version);
 
-                String groupId = DependencyGroupSearcher.findGroupId(artifactId, version);
+                String groupId = IDependencyGroupSearcher.UNCLASSIFIED;
+                for (IDependencyGroupSearcher searcher : searchers) {
+                    if (!(groupId = searcher.findGroupId(artifactId, version)).equals(IDependencyGroupSearcher.UNCLASSIFIED)) {
+                        break;
+                    }
+                }
 //                System.out.println(groupId);
+
+                if (!groupId.equals(PublicDependencyGroupSearcher.UNCLASSIFIED)) {
+                    successCount++;
+                }
+
+                //duplicate found
+                if (!dependencySet.add(groupId + "-" + artifactId + "-" + version)) {
+                    continue;
+                }
 
                 System.out.println();
 
@@ -60,7 +77,6 @@ public class DependencyXmlGenerator {
                 Element versionElement = doc.createElement("version");
                 versionElement.appendChild(doc.createTextNode(version));
                 dependencyElement.appendChild(versionElement);
-
             }
         }
 
@@ -73,7 +89,8 @@ public class DependencyXmlGenerator {
 
         transformer.transform(source, result);
 
-        System.out.println("Conversation rate: " + successCount / dependencyList.size() * 100 + "%");
+        System.out.println("Conversation rate: " + String.format("%.2f", (double)successCount/dependencyList.size() * 100) + "% ("
+                + successCount + " out of " + dependencyList.size() + ")");
 
     }
 }

@@ -1,5 +1,8 @@
 import reader.*;
+import searcher.PublicDependencyGroupSearcher;
+import searcher.IDependencyGroupSearcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -36,7 +39,11 @@ public class Main {
             System.out.println("Dependency List:");
             System.out.println(dependencyList);
 
-            DependencyXmlGenerator.generatePomFile(outputPath, dependencyList);
+            //New groupId searcher goes here
+            List<IDependencyGroupSearcher> searchers = new ArrayList<>();
+            searchers.add(new PublicDependencyGroupSearcher());
+
+            DependencyXmlGenerator.generatePomFile(outputPath, dependencyList, searchers);
 
             System.out.println("COMPLETED");
 

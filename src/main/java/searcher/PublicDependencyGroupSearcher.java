@@ -1,16 +1,14 @@
-import com.owlike.genson.ext.jaxrs.GensonJsonConverter;
+package searcher;
+
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import javax.ws.rs.core.MediaType;
 import java.util.Scanner;
 
-public class DependencyGroupSearcher {
+public class PublicDependencyGroupSearcher implements IDependencyGroupSearcher{
 
-    public static String findGroupId(String artifactId, String version) {
+    public String findGroupId(String artifactId, String version) {
         Client client = Client.create();
 
         String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22&wt=json";
@@ -23,7 +21,7 @@ public class DependencyGroupSearcher {
                 .get(Object.class)
                 .toString();
 
-        String groupId = "unclassified";
+        String groupId = UNCLASSIFIED;
         int resultIdxStart = resp.indexOf("docs=");
         int resultIdxEnd = resp.indexOf("}]", resultIdxStart);
         if (resultIdxEnd < 0) { //not found
