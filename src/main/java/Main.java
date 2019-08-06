@@ -1,4 +1,5 @@
 import reader.*;
+import searcher.LocalCacheDependencyGroupSearcher;
 import searcher.PublicDependencyGroupSearcher;
 import searcher.IDependencyGroupSearcher;
 
@@ -41,6 +42,7 @@ public class Main {
 
             //New groupId searcher goes here
             List<IDependencyGroupSearcher> searchers = new ArrayList<>();
+            searchers.add(new LocalCacheDependencyGroupSearcher());
             searchers.add(new PublicDependencyGroupSearcher());
 
             DependencyXmlGenerator.generatePomFile(outputPath, dependencyList, searchers);

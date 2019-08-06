@@ -4,9 +4,12 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 import javax.ws.rs.core.MediaType;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
-public class PublicDependencyGroupSearcher implements IDependencyGroupSearcher{
+public class PublicDependencyGroupSearcher implements IDependencyGroupSearcher, Cacheable{
 
     public String findGroupId(String artifactId, String version) {
         Client client = Client.create();
@@ -49,6 +52,8 @@ public class PublicDependencyGroupSearcher implements IDependencyGroupSearcher{
                 }
                 else {
                     groupId = resp.substring(groupIdIdx+2, resp.indexOf(",",groupIdIdx));
+
+                    writeToCache(artifactId, version, groupId);
                 }
             }
         }
