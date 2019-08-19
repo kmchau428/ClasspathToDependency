@@ -1,4 +1,4 @@
-package reader;
+package dependency_generator.reader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -11,7 +11,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,8 +24,6 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
 
         File[] libXmlFiles = libDir.listFiles();
         for(File libXmlFile : libXmlFiles) {
-            System.out.println("Processing file: " +libXmlFile.getName());
-
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document doc = docBuilder.parse(libXmlFile);
@@ -45,7 +42,7 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
                     String url = element.getAttribute("url");
 
                     if (url.startsWith("jar")) {
-                        jarClasspaths = resolveJars(url,jarClasspaths);
+                        jarClasspaths = resolveJars(url,filePath,jarClasspaths);
                     }
                     else if (url.startsWith("file")) {
                         jarClasspaths = resolveFiles(url,filePath,jarClasspaths);
@@ -56,19 +53,10 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
             System.out.println();
         }
 
-
         return jarClasspaths;
     }
 
-    private List<String> resolveJars(String url, List<String> jarClasspaths) {
-        jarClasspaths.add(url.substring(0, url.lastIndexOf("!/"))); //the entry ends with !/
-
-
-        return jarClasspaths;
-    }
-
-    private List<String> resolveFiles(String url, String filePath, List<String> jarClasspaths) {
-        //NodeList nodeList = doc.getElementsByTagName("jarDirectory");
+    private String resolveJarDirPath(String url, String filePath ) {
         String parentDir = "";
         if (url.contains("$PROJECT_DIR$")) {
             parentDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
@@ -78,14 +66,25 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
         }
 
         String jarDirPath = url.substring(url.lastIndexOf("$") + "$".length() + 1);
-//        System.out.println("jarDirPath**" + jarDirPath);
-        Path p1 = Paths.get(jarDirPath);
-        String normalizedJarDirPath = p1.normalize().toString().replace(".." + File.separator,"");
-//        System.out.println("normalizedJarDirPath**" + normalizedJarDirPath);
+        Path path = Paths.get(jarDirPath);
+        String normalizedJarDirPath = path.normalize().toString().replace(".." + File.separator,"");
 
-        File jarDir = new File(parentDir + File.separator + normalizedJarDirPath);
+        return parentDir + File.separator + normalizedJarDirPath;
+    }
+
+    private List<String> resolveJars(String url, String filePath, List<String> jarClasspaths) {
+        String fullPath = resolveJarDirPath(url, filePath);
+        jarClasspaths.add(fullPath.replaceAll("!","")); //the entry ends with !/
+
+        return jarClasspaths;
+    }
+
+    private List<String> resolveFiles(String url, String filePath, List<String> jarClasspaths) {
+        String fullPath = resolveJarDirPath(url, filePath);
+        File jarDir = new File(fullPath);
+
         for (File jar : jarDir.listFiles()) {
-            jarClasspaths.add(jar.getName());
+            jarClasspaths.add(fullPath + File.separator + jar.getName());
         }
 
         return jarClasspaths;

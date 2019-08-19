@@ -1,4 +1,4 @@
-package reader;
+package dependency_generator.reader;
 
 import org.xml.sax.SAXException;
 

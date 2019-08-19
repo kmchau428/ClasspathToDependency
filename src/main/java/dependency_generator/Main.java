@@ -1,12 +1,18 @@
-import reader.*;
-import searcher.LocalCacheDependencyGroupSearcher;
-import searcher.PublicDependencyGroupSearcher;
-import searcher.IDependencyGroupSearcher;
+package dependency_generator;
+
+import dependency_generator.reader.EclipseClasspathFileReader;
+import dependency_generator.reader.IClasspathFileReader;
+import dependency_generator.reader.IntelliJClasspathFileReader;
+import dependency_generator.searcher.IDependencySearcher;
+import dependency_generator.searcher.LocalCacheDependencySearcher;
+import dependency_generator.searcher.PublicDependencySearcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+
+    public static List<String> unresolvedJars = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -40,14 +46,19 @@ public class Main {
             System.out.println("Dependency List:");
             System.out.println(dependencyList);
 
-            //New groupId searcher goes here
-            List<IDependencyGroupSearcher> searchers = new ArrayList<>();
-            searchers.add(new LocalCacheDependencyGroupSearcher());
-            searchers.add(new PublicDependencyGroupSearcher());
+            //New groupId dependency_generator.searcher goes here
+            List<IDependencySearcher> searchers = new ArrayList<>();
+            searchers.add(new LocalCacheDependencySearcher());
+            searchers.add(new PublicDependencySearcher());
 
             DependencyXmlGenerator.generatePomFile(outputPath, dependencyList, searchers);
 
             System.out.println("COMPLETED");
+
+            System.out.println("The following JARs cannot be automatically resolved:");
+            for (String jar : unresolvedJars) {
+                System.out.println(jar);
+            }
 
         }
         catch (Exception e) {
