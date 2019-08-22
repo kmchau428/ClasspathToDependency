@@ -38,7 +38,7 @@ public class DependencyXmlGenerator {
                 String jar = matcher.group(0);
                 System.out.println("Resolving jar: " + jar);
 
-                String artifactId = jar.split("-\\d[.]")[0];
+                String artifactId = jar.split("-\\d+[.]")[0];
 //                System.out.println(artifactId);
 
                 String version = jar.substring(jar.lastIndexOf("-")+1, jar.lastIndexOf(".jar"));
