@@ -44,17 +44,26 @@ public class DependencyXmlGenerator {
                 String jar = matcher.group(0);
                 System.out.println("\nResolving jar: " + jar);
 
-                String checksum = genChecksum(dependencyItem);
+                String[] jarName = jar.split("\\\\");
+                String artifactId = jarName[jarName.length-1].split("-\\d+[.]")[0].replaceAll(".jar","");
+                String version =
+                        jar.lastIndexOf("-") < jar.lastIndexOf(artifactId) + artifactId.length() ?
+                        "" :
+                        jar.substring(jar.lastIndexOf("-")+1, jar.lastIndexOf(".jar"));
+
+                String checksum;
+                try {
+                    checksum = genChecksum(dependencyItem);
+                }
+                catch (IOException e) {
+                    checksum = artifactId + (version.equals("") ? "" : "-" + version);
+                }
 
                 //duplicate found
                 if (!dependencySet.add(checksum)) {
                     System.out.println("duplicate found, will be ignored.");
                     continue;
                 }
-
-                String[] jarName = jar.split("\\\\");
-                String artifactId = jarName[jarName.length-1].split("-\\d[.]")[0];
-                String version = jar.substring(jar.lastIndexOf("-")+1, jar.lastIndexOf(".jar"));
 
                 DependencyEntry dependencyEntry = null;
                 for (IDependencySearcher searcher : searchers) {

@@ -12,8 +12,11 @@ public class PublicDependencySearcher implements IDependencySearcher, Cacheable{
     public DependencyEntry resolveDependency(String artifactId, String version, String checksum) {
         Client client = Client.create();
 
-//        String endpoint = "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22&wt=json";
-        String endpoint = "https://search.maven.org/solrsearch/select?q=1:" + checksum + "&wt=json";
+//        String endpoint =
+        String endpoint = checksum.contains("-") ?
+                "https://search.maven.org/solrsearch/select?q=a:%22" + artifactId + "%22%20AND%20v:%22" + version + "%22&wt=json" :
+                "https://search.maven.org/solrsearch/select?q=1:" + checksum + "&wt=json"
+                ;
         System.out.println("resolving the dependency: " + endpoint);
         System.out.println( "checksum:" + checksum);
         WebResource webResource = client.resource(endpoint);
@@ -30,8 +33,9 @@ public class PublicDependencySearcher implements IDependencySearcher, Cacheable{
         );
 
         if (numFound == 0) { //not found
-            System.out.println("The jar " + artifactId + "-" + version + " cannot be found");
-            Main.unresolvedJars.add(artifactId + "-" + version + ".jar");
+            String versionStr = version.equals("") ? "" : "-" + version;
+            System.out.println("The jar " + artifactId + versionStr + " cannot be found");
+            Main.unresolvedJars.add(artifactId + versionStr + ".jar");
 
             return new DependencyEntry();
         }

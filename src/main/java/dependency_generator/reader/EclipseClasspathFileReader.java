@@ -46,14 +46,14 @@ public class EclipseClasspathFileReader implements IClasspathFileReader {
                 String path = element.getAttribute("path");
 
                 if (kind.equals("lib")) {
+                    if (System.getProperty("os.name").contains("Windows"))
+                        path = path.replaceAll("/", "\\\\");
+
                     if (new File(path).exists())  {
                         jarClasspaths.add(path);
                     }
-                    else if (new File(filePath + File.separator + path).exists()) {
+                    else  {
                         jarClasspaths.add(filePath + File.separator + path);
-                    }
-                    else {
-                        System.out.println("Faield to resolve " + filePath + File.separator + path);
                     }
                 }
             }
