@@ -41,6 +41,10 @@ public class IntelliJClasspathFileReader implements IClasspathFileReader {
 
                     String url = element.getAttribute("url");
 
+                    if (url.contains("-javadoc.jar") || url.contains("-sources.jar")) {
+                        continue;
+                    }
+
                     if (url.startsWith("jar")) {
                         jarClasspaths = resolveJars(url,filePath,jarClasspaths);
                     }
