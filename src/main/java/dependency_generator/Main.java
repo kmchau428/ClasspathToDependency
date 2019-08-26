@@ -13,6 +13,7 @@ import java.util.List;
 public class Main {
 
     public static List<String> unresolvedJars = new ArrayList<>();
+    public static List<String> resolvedByNameJars = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -57,6 +58,11 @@ public class Main {
 
             System.out.println("The following JARs cannot be automatically resolved:");
             for (String jar : unresolvedJars) {
+                System.out.println(jar);
+            }
+
+            System.out.println("\nThe following JARs are NOT resolved by checksum (risk of delta in JAR content)");
+            for (String jar : resolvedByNameJars) {
                 System.out.println(jar);
             }
 

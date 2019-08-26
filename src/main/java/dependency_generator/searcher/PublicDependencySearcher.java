@@ -54,6 +54,8 @@ public class PublicDependencySearcher implements IDependencySearcher, Cacheable{
             if (!LocalCacheDependencySearcher.cache.containsKey(a+"-"+v))
                 writeToCache(g, a, v);
 
+            Main.resolvedByNameJars.add(a + "-" + v + ".jar");
+
             return new DependencyEntry(g,a,v);
         }
     }
