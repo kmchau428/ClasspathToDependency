@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +56,7 @@ public class DependencyXmlGenerator {
                 try {
                     checksum = genChecksum(dependencyItem);
                 }
-                catch (IOException e) {
+                catch (FileNotFoundException e) {
                     checksum = artifactId + (version.equals("") ? "" : "-" + version);
                 }
 
