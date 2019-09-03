@@ -1,12 +1,15 @@
-package dependency_generator;
+package dependency_generator.generator;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import dependency_generator.DependencyConverter;
+import dependency_generator.Main;
 import dependency_generator.dto.DependencyEntry;
 import dependency_generator.searcher.IDependencySearcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,17 +20,19 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DependencyXmlGenerator {
-    public static void generatePomFile(String fileDest, List<String> dependencyList, List<IDependencySearcher> searchers) throws TransformerException, ParserConfigurationException, IOException {
+public class DependencyFileGenerator {
+
+    public static final String DEPENDENCY_TXT_FILEPATH = "_dependency.txt";
+
+    public static void generateDepFile(String fileDest, List<String> dependencyList, List<IDependencySearcher> searchers, String buildTool)
+            throws TransformerException, ParserConfigurationException, IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -95,14 +100,19 @@ public class DependencyXmlGenerator {
             }
         }
 
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "5");
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File(fileDest + File.separator + "pom_dependency.xml"));
+        if (buildTool.equals(Main.BUILD_TOOL_MAVEN)) {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "5");
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(fileDest + File.separator + DEPENDENCY_TXT_FILEPATH));
+            transformer.transform(source, result);
+        }
+        else {
+            DependencyConverter.convert(fileDest + File.separator + DEPENDENCY_TXT_FILEPATH, doc, buildTool);
+        }
 
-        transformer.transform(source, result);
 
         System.out.println("\nConversation rate: " + String.format("%.2f", (double)successCount/dependencySet.size() * 100) + "% ("
                 + successCount + " out of " + dependencySet.size() + ")");

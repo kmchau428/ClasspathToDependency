@@ -1,16 +1,21 @@
 package dependency_generator;
 
+import dependency_generator.generator.DependencyFileGenerator;
 import dependency_generator.reader.EclipseClasspathFileReader;
 import dependency_generator.reader.IClasspathFileReader;
 import dependency_generator.reader.IntelliJClasspathFileReader;
-import dependency_generator.searcher.IDependencySearcher;
-import dependency_generator.searcher.LocalCacheDependencySearcher;
-import dependency_generator.searcher.PublicDependencySearcher;
+import dependency_generator.searcher.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+
+    public static final String IDE_INTELLI_J = "IntelliJ";
+    public static final String IDE_ECLIPSE = "Eclipse";
+
+    public static final String BUILD_TOOL_MAVEN = "Maven";
+    public static final String BUILD_TOOL_GRADLE = "Gradle";
 
     public static List<String> unresolvedJars = new ArrayList<>();
     public static List<String> resolvedByNameJars = new ArrayList<>();
@@ -18,7 +23,7 @@ public class Main {
     public static void main(String[] args) {
         try {
 
-            String ide = "", inputPath = "", outputPath = "";
+            String ide = "", inputPath = "", outputPath = "", buildTool = "";
             for (String arg : args) {
                 if (arg.startsWith("-i")) {
                     ide = arg.substring(2);
@@ -29,14 +34,17 @@ public class Main {
                 else if (arg.startsWith("-o")) {
                     outputPath = arg.substring(2);
                 }
+                else if (arg.startsWith("-b")) {
+                    buildTool = arg.substring(2);
+                }
             }
 
             IClasspathFileReader classpathFileReader = null;
             switch (ide) {
-                case "IntelliJ":
+                case IDE_INTELLI_J:
                     classpathFileReader = new IntelliJClasspathFileReader();
                     break;
-                case "Eclipse":
+                case IDE_ECLIPSE:
                     classpathFileReader = new EclipseClasspathFileReader();
                     break;
                 default:
@@ -50,9 +58,11 @@ public class Main {
             //New groupId dependency_generator.searcher goes here
             List<IDependencySearcher> searchers = new ArrayList<>();
             searchers.add(new LocalCacheDependencySearcher());
+            searchers.add(new MavenLocalRepoSearcher());
+            searchers.add(new GradleCacheSearcher());
             searchers.add(new PublicDependencySearcher());
 
-            DependencyXmlGenerator.generatePomFile(outputPath, dependencyList, searchers);
+            DependencyFileGenerator.generateDepFile(outputPath, dependencyList, searchers, buildTool);
 
             System.out.println("COMPLETED");
 
