@@ -1,5 +1,7 @@
 # ClasspathToDependency
 
+Purpose: to convert Java classpath to Maven/Gradle dependencies
+
 OS: Windows
 
 JDK required: JDK8+
