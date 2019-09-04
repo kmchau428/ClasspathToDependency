@@ -1,4 +1,4 @@
-package reader;
+package dependency_generator.reader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,7 +18,6 @@ public class EclipseClasspathFileReader implements IClasspathFileReader {
     @Override
     public List<String> read(String filePath) throws ParserConfigurationException, IOException, SAXException {
         File libXmlFile = new File(filePath + File.separator + ".classpath");
-        System.out.println("Processing file: " +libXmlFile.getName());
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -47,7 +46,15 @@ public class EclipseClasspathFileReader implements IClasspathFileReader {
                 String path = element.getAttribute("path");
 
                 if (kind.equals("lib")) {
-                    jarClasspaths.add(path);
+                    if (System.getProperty("os.name").contains("Windows"))
+                        path = path.replaceAll("/", "\\\\");
+
+                    if (new File(path).exists())  {
+                        jarClasspaths.add(path);
+                    }
+                    else  {
+                        jarClasspaths.add(filePath + File.separator + path);
+                    }
                 }
             }
         }
