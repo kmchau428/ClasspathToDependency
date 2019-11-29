@@ -1,5 +1,1 @@
 group_id,artifact_id,version
-javax.ws.rs,jsr311-api,1.1.1
-com.owlike,genson,1.4
-com.sun.jersey,jersey-core,1.19.4
-com.sun.jersey,jersey-client,1.19.4
